@@ -4,14 +4,20 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import com.gildedrose.model.Item;
+
 
 public class GildedRoseTest {
 
+    private static final int MINIMUM_QUALITY = 0;
+    private static final int MAXIMUM_QUALITY = 50;
+    private static final int LEGENDARY_QUALITY = 80;
+
     private static final String DEGRADING_ITEM_NAME = "Basic item";
-    private static final String IMPROVING_ITEM_NAME = "Aged Brie"; // TODO: "Improving item"
-    private static final String EXPIRING_ITEM_NAME = "Backstage passes to a TAFKAL80ETC concert"; // TODO "Expiring item"
-    private static final String LEGENDARY_ITEM_NAME = "Sulfuras, Hand of Ragnaros"; // TODO "Legendary item"
-    private static final String CONJURED_ITEM_NAME = "Conjured item";
+    private static final String IMPROVING_ITEM_NAME = "Aged Brie"; // "Improving item"
+    private static final String EXPIRING_ITEM_NAME = "Backstage passes to a TAFKAL80ETC concert"; // "Expiring item"
+    private static final String LEGENDARY_ITEM_NAME = "Sulfuras, Hand of Ragnaros"; // "Legendary item"
+    private static final String CONJURED_ITEM_NAME = "Conjured Mana Cake"; // "Conjured item"
 
     /*
      * Degrading item
@@ -39,18 +45,18 @@ public class GildedRoseTest {
     }
 
     @Test
-    public void when_ItemDegrades_then_QualityNotNegative() {
+    public void when_ItemDegrades_then_QualityNotUnderMinimum() {
         Item basicItem = new Item(DEGRADING_ITEM_NAME, 10, 0);
         Item[] basicItems = new Item[] {basicItem};
         GildedRose gildedRose = new GildedRose(basicItems);
 
         gildedRose.updateQuality();
 
-        assertEquals(0, gildedRose.items[0].quality);
+        assertEquals(MINIMUM_QUALITY, gildedRose.items[0].quality);
     }
 
     @Test
-    public void when_ItemDegrades_then_QualityMax50() {
+    public void when_ItemDegrades_then_QualityNotOverMaximum() {
         Item basicItem = new Item(DEGRADING_ITEM_NAME, 10, 50);
         Item[] basicItems = new Item[] {basicItem};
         GildedRose gildedRose = new GildedRose(basicItems);
@@ -58,6 +64,28 @@ public class GildedRoseTest {
         gildedRose.updateQuality();
 
         assertEquals(49, gildedRose.items[0].quality);
+    }
+
+    @Test
+    public void when_ItemDegradesAndSellByDateToday_then_QualityDecreasesTwiceAsFast() {
+        Item basicItem = new Item(DEGRADING_ITEM_NAME, 0, 20);
+        Item[] basicItems = new Item[] {basicItem};
+        GildedRose gildedRose = new GildedRose(basicItems);
+        
+        gildedRose.updateQuality();
+        
+        assertEquals(18, gildedRose.items[0].quality);
+    }
+
+    @Test
+    public void when_ItemDegradesAndSellByDatePast_then_QualityDecreasesTwiceAsFast() {
+        Item basicItem = new Item(DEGRADING_ITEM_NAME, -1, 20);
+        Item[] basicItems = new Item[] {basicItem};
+        GildedRose gildedRose = new GildedRose(basicItems);
+        
+        gildedRose.updateQuality();
+        
+        assertEquals(18, gildedRose.items[0].quality);
     }
 
     /*
@@ -86,7 +114,7 @@ public class GildedRoseTest {
     }
 
     @Test
-    public void when_ItemImproves_then_QualityNotNegative() {
+    public void when_ItemImproves_then_QualityNotUnderMinimum() {
         Item improvingItem = new Item(IMPROVING_ITEM_NAME, 5, 0);
         Item[] agingItems = new Item[] {improvingItem};
         GildedRose gildedRose = new GildedRose(agingItems);
@@ -97,14 +125,36 @@ public class GildedRoseTest {
     }
 
     @Test
-    public void when_ItemImproves_then_QualityMax50() {
+    public void when_ItemImproves_then_QualityNotOverMaximum() {
         Item improvingItem = new Item(IMPROVING_ITEM_NAME, 5, 50);
         Item[] agingItems = new Item[] {improvingItem};
         GildedRose gildedRose = new GildedRose(agingItems);
 
         gildedRose.updateQuality();
 
-        assertEquals(50, gildedRose.items[0].quality);
+        assertEquals(MAXIMUM_QUALITY, gildedRose.items[0].quality);
+    }
+    
+    @Test
+    public void when_ItemImprovesAndSellByDateToday_then_QualityIncreasesTwiceAsFast() {
+        Item improvingItem = new Item(IMPROVING_ITEM_NAME, 0, 1);
+        Item[] agingItems = new Item[] {improvingItem};
+        GildedRose gildedRose = new GildedRose(agingItems);
+        
+        gildedRose.updateQuality();
+        
+        assertEquals(3, gildedRose.items[0].quality);
+    }
+
+    @Test
+    public void when_ItemImprovesAndSellByDatePast_then_QualityIncreasesTwiceAsFast() {
+        Item improvingItem = new Item(IMPROVING_ITEM_NAME, -1, 1);
+        Item[] agingItems = new Item[] {improvingItem};
+        GildedRose gildedRose = new GildedRose(agingItems);
+        
+        gildedRose.updateQuality();
+        
+        assertEquals(3, gildedRose.items[0].quality);
     }
 
     /*
@@ -133,7 +183,7 @@ public class GildedRoseTest {
     }
 
     @Test
-    public void when_ItemExpires_then_QualityNotNegative() {
+    public void when_ItemExpires_then_QualityNotUnderMinimum() {
         Item expiringItem = new Item(EXPIRING_ITEM_NAME, 15, 0);
         Item[] expiringItems = new Item[] {expiringItem};
         GildedRose gildedRose = new GildedRose(expiringItems);
@@ -144,18 +194,18 @@ public class GildedRoseTest {
     }
 
     @Test
-    public void when_ItemExpires_then_QualityMax50() {
+    public void when_ItemExpires_then_QualityNotOverMaximum() {
         Item expiringItem = new Item(EXPIRING_ITEM_NAME, 15, 50);
         Item[] expiringItems = new Item[] {expiringItem};
         GildedRose gildedRose = new GildedRose(expiringItems);
 
         gildedRose.updateQuality();
 
-        assertEquals(50, gildedRose.items[0].quality);
+        assertEquals(MAXIMUM_QUALITY, gildedRose.items[0].quality);
     }
 
     @Test
-    public void when_ItemExpiresIn10daysOrLess_then_QualityIncreasesBy2() {
+    public void when_ItemExpiresIn10days_then_QualityIncreasesBy2() {
         Item expiringItem = new Item(EXPIRING_ITEM_NAME, 10, 20);
         Item[] expiringItems = new Item[] {expiringItem};
         GildedRose gildedRose = new GildedRose(expiringItems);
@@ -166,18 +216,40 @@ public class GildedRoseTest {
     }
 
     @Test
-    public void when_ItemExpiresIn10daysOrLess_then_QualityIncreasesBy2_QualityMax50() {
-        Item expiringItem = new Item(EXPIRING_ITEM_NAME, 10, 50);
+    public void when_ItemExpiresInLessThan10days_then_QualityIncreasesBy2() {
+        Item expiringItem = new Item(EXPIRING_ITEM_NAME, 8, 20);
         Item[] expiringItems = new Item[] {expiringItem};
         GildedRose gildedRose = new GildedRose(expiringItems);
         
         gildedRose.updateQuality();
         
-        assertEquals(50, gildedRose.items[0].quality);
+        assertEquals(22, gildedRose.items[0].quality);
     }
 
     @Test
-    public void when_ItemExpiresIn5daysOrLess_then_QualityIncreasesBy3() {
+    public void when_ItemExpiresIn10days_then_QualityIncreasesBy2_QualityNotOverMaximum() {
+        Item expiringItem = new Item(EXPIRING_ITEM_NAME, 10, 50);
+        Item[] expiringItems = new Item[] {expiringItem};
+        GildedRose gildedRose = new GildedRose(expiringItems);
+
+        gildedRose.updateQuality();
+
+        assertEquals(MAXIMUM_QUALITY, gildedRose.items[0].quality);
+    }
+
+    @Test
+    public void when_ItemExpiresInLessThan10days_then_QualityIncreasesBy2_QualityNotOverMaximum() {
+        Item expiringItem = new Item(EXPIRING_ITEM_NAME, 8, 50);
+        Item[] expiringItems = new Item[] {expiringItem};
+        GildedRose gildedRose = new GildedRose(expiringItems);
+        
+        gildedRose.updateQuality();
+        
+        assertEquals(MAXIMUM_QUALITY, gildedRose.items[0].quality);
+    }
+
+    @Test
+    public void when_ItemExpiresIn5days_then_QualityIncreasesBy3() {
         Item expiringItem = new Item(EXPIRING_ITEM_NAME, 5, 20);
         Item[] expiringItems = new Item[] {expiringItem};
         GildedRose gildedRose = new GildedRose(expiringItems);
@@ -186,27 +258,60 @@ public class GildedRoseTest {
 
         assertEquals(23, gildedRose.items[0].quality);
     }
-
+    
     @Test
-    public void when_ItemExpiresIn5daysOrLess_then_QualityIncreasesBy3_QualityMax50() {
-        Item expiringItem = new Item(EXPIRING_ITEM_NAME, 5, 50);
+    public void when_ItemExpiresInLessThan5days_then_QualityIncreasesBy3() {
+        Item expiringItem = new Item(EXPIRING_ITEM_NAME, 3, 20);
         Item[] expiringItems = new Item[] {expiringItem};
         GildedRose gildedRose = new GildedRose(expiringItems);
         
         gildedRose.updateQuality();
         
-        assertEquals(50, gildedRose.items[0].quality);
+        assertEquals(23, gildedRose.items[0].quality);
     }
 
     @Test
-    public void when_ItemExpired_then_QualityIsZero() {
-        Item expiringItem = new Item(EXPIRING_ITEM_NAME, 0, 50);
+    public void when_ItemExpiresIn5days_then_QualityIncreasesBy3_QualityNotOverMaximum() {
+        Item expiringItem = new Item(EXPIRING_ITEM_NAME, 5, 50);
         Item[] expiringItems = new Item[] {expiringItem};
         GildedRose gildedRose = new GildedRose(expiringItems);
 
         gildedRose.updateQuality();
 
-        assertEquals(0, gildedRose.items[0].quality);
+        assertEquals(MAXIMUM_QUALITY, gildedRose.items[0].quality);
+    }
+
+    @Test
+    public void when_ItemExpiresInLessThan5days_then_QualityIncreasesBy3_QualityNotOverMaximum() {
+        Item expiringItem = new Item(EXPIRING_ITEM_NAME, 3, 50);
+        Item[] expiringItems = new Item[] {expiringItem};
+        GildedRose gildedRose = new GildedRose(expiringItems);
+        
+        gildedRose.updateQuality();
+        
+        assertEquals(MAXIMUM_QUALITY, gildedRose.items[0].quality);
+    }
+
+    @Test
+    public void when_ItemExpired_then_QualityIsMinimum() {
+        Item expiringItem = new Item(EXPIRING_ITEM_NAME, 0, 33);
+        Item[] expiringItems = new Item[] {expiringItem};
+        GildedRose gildedRose = new GildedRose(expiringItems);
+
+        gildedRose.updateQuality();
+
+        assertEquals(MINIMUM_QUALITY, gildedRose.items[0].quality);
+    }
+
+    @Test
+    public void when_ItemExpiredPastSellIn_then_QualityIsMinimum() {
+        Item expiringItem = new Item(EXPIRING_ITEM_NAME, -2, 50);
+        Item[] expiringItems = new Item[] {expiringItem};
+        GildedRose gildedRose = new GildedRose(expiringItems);
+        
+        gildedRose.updateQuality();
+        
+        assertEquals(MINIMUM_QUALITY, gildedRose.items[0].quality);
     }
 
     /*
@@ -214,7 +319,7 @@ public class GildedRoseTest {
      */
     @Test
     public void when_ItemLegendary_then_SellInNotChanged() {
-        Item legendaryItem = new Item(LEGENDARY_ITEM_NAME, 0, 80);
+        Item legendaryItem = new Item(LEGENDARY_ITEM_NAME, 0, LEGENDARY_QUALITY);
         Item[] legendaryItems = new Item[] {legendaryItem};
         GildedRose gildedRose = new GildedRose(legendaryItems);
 
@@ -225,24 +330,13 @@ public class GildedRoseTest {
 
     @Test
     public void when_ItemLegendary_then_QualityNotChanged() {
-        Item legendaryItem = new Item(LEGENDARY_ITEM_NAME, 0, 80);
+        Item legendaryItem = new Item(LEGENDARY_ITEM_NAME, 0, LEGENDARY_QUALITY);
         Item[] legendaryItems = new Item[] {legendaryItem};
         GildedRose gildedRose = new GildedRose(legendaryItems);
 
         gildedRose.updateQuality();
 
-        assertEquals(80, gildedRose.items[0].quality);
-    }
-
-    @Test
-    public void when_ItemLegendary_then_QualityIs80() {
-        Item legendaryItem = new Item(LEGENDARY_ITEM_NAME, 0, 80);
-        Item[] legendaryItems = new Item[] {legendaryItem};
-        GildedRose gildedRose = new GildedRose(legendaryItems);
-
-        gildedRose.updateQuality();
-
-        assertEquals(80, gildedRose.items[0].quality);
+        assertEquals(LEGENDARY_QUALITY, gildedRose.items[0].quality);
     }
 
     /*
@@ -271,18 +365,18 @@ public class GildedRoseTest {
     }
 
     @Test
-    public void when_ItemConjured_then_QualityNotNegative() {
+    public void when_ItemConjured_then_QualityNotUnderMinimum() {
         Item conjuredItem = new Item(CONJURED_ITEM_NAME, 3, 0);
         Item[] conjuredItems = new Item[] {conjuredItem};
         GildedRose gildedRose = new GildedRose(conjuredItems);
 
         gildedRose.updateQuality();
 
-        assertEquals(0, gildedRose.items[0].quality);
+        assertEquals(MINIMUM_QUALITY, gildedRose.items[0].quality);
     }
 
     @Test
-    public void when_ItemConjured_then_QualityMax50() {
+    public void when_ItemConjured_then_QualityNotOverMaximum() {
         Item conjuredItem = new Item(CONJURED_ITEM_NAME, 3, 50);
         Item[] conjuredItems = new Item[] {conjuredItem};
         GildedRose gildedRose = new GildedRose(conjuredItems);
