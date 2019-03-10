@@ -6,6 +6,7 @@ target/
 .project
 .settings/
 bin/
+doc/
 
 # Compiled class file
 *.class
