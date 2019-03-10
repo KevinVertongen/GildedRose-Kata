@@ -4,8 +4,8 @@ target/
 
 .classpath
 .project
-bin/
 .settings/
+bin/
 
 # Compiled class file
 *.class
@@ -27,4 +27,3 @@ bin/
 *.zip
 *.tar.gz
 *.rar
-
